@@ -22,14 +22,11 @@ public class Problem2 extends BaseClass {
         // Start Solution Edits
         // Solve Challenge 1 here
         // lsl8  09.23.25
-        // Step 1: Iterate through the array by using ..
-        // Step 2: Track sum by.. //Step 3: update representation by .. and assign to modifiedTotal
-
-
-        
-      
+        for (double value : arr){ // Step 1: Iterate through the array by using a for loop
+            total += value; // Step 2: Track sum by adding each value to the sum 
+        }
         // Solve Challenge 2 here
-        Object modifiedTotal = "?";
+        Object modifiedTotal = String.format("%.2f", total); //Step 3: update representation by formatting to 2 decimal places and assign to modifiedTotal
 
         // End Solution Edits
         System.out.println("Total Raw Value: " +total);
