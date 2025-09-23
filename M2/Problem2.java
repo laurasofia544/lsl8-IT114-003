@@ -21,6 +21,11 @@ public class Problem2 extends BaseClass {
         double total = 0;
         // Start Solution Edits
         // Solve Challenge 1 here
+        // lsl8  09.23.25
+        // Step 1: Iterate through the array by using ..
+        // Step 2: Track sum by.. //Step 3: update representation by .. and assign to modifiedTotal
+
+
         
       
         // Solve Challenge 2 here
