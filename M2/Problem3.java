@@ -19,13 +19,9 @@ public class Problem3 extends BaseClass {
         // Start Solution Edits
         // lsl8 09/29/25
         // Step 1: Iterate the arr by looping through each element
-        // Step 2: Use instanceof to check type
-        // Step 3: Use ... to make positive
-        // Step 4: Use ... to convert back to original type
-        // Step 5: Use ... to assign back to the same slot of the output array
         for (int i = 0; i < arr.length; i++) {
-            Object v = arr[i];
-            if (v instanceof Integer) {
+            Object v = arr[i]; 
+            if (v instanceof Integer) { // Step 2: Use instanceof to check type
                 output[i] = Math.abs((Integer) v);   
             } else if (v instanceof Double) {
                 output[i] = Math.abs((Double) v);    
@@ -33,10 +29,10 @@ public class Problem3 extends BaseClass {
                 output[i] = Math.abs((Float) v);     
             } else if (v instanceof String) {
                 String s = (String) v;
-            if (s.startsWith("-")) s = s.substring(1);
+            if (s.startsWith("-")) s = s.substring(1); // Step 3: Use to make positive
                 output[i] = s;                       
             } else {
-                output[i] = v;
+                output[i] = v; // Step 5: Use to assign back to the same slot of the output array
             }
         }
         // End Solution Edits
