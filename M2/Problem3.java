@@ -22,14 +22,14 @@ public class Problem3 extends BaseClass {
         for (int i = 0; i < arr.length; i++) {
             Object v = arr[i]; 
             if (v instanceof Integer) { // Step 2: Use instanceof to check type
-                output[i] = Math.abs((Integer) v);   
+                output[i] = Math.abs((Integer) v); // Step 3: Use Math.abs to make positive  
             } else if (v instanceof Double) {
                 output[i] = Math.abs((Double) v);    
             } else if (v instanceof Float) {
                 output[i] = Math.abs((Float) v);     
             } else if (v instanceof String) {
                 String s = (String) v;
-            if (s.startsWith("-")) s = s.substring(1); // Step 3: Use to make positive
+            if (s.startsWith("-")) s = s.substring(1);
                 output[i] = s;                       
             } else {
                 output[i] = v; // Step 5: Use to assign back to the same slot of the output array
