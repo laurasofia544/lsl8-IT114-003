@@ -30,6 +30,19 @@ public class Problem4 extends BaseClass {
         
         for(int i = 0; i <arr.length; i++){
             // Start Solution Edits
+
+            //lsl8 09/29/25
+            // step 1: using ... to remove non-alphanumeric characters, using ... to
+            // preserve spaces
+            // step 2: using ... to make text title case
+            // step 3: using ... to remove spaces at beginning and end, using ... to remove
+            // duplicate spaces
+            // step 4: assigning result to placeholderForModifiedPhrase
+            // step 5: using ... to determine middle
+            // step 6: using ... to get up to the middle 3 characters
+            // step 7: using ... to ensure the middle characters exclude first and last of 
+            // word/phrase
+            // step 8: assigning to placeholderForMiddleCharacters
             
              // End Solution Edits
             System.out.println(String.format("Index[%d] \"%s\" | Middle: \"%s\"",i, placeholderForModifiedPhrase, placeholderForMiddleCharacters));
