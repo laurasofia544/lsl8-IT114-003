@@ -32,18 +32,36 @@ public class Problem4 extends BaseClass {
             // Start Solution Edits
 
             //lsl8 09/29/25
-            // step 1: using ... to remove non-alphanumeric characters, using ... to
+            String s = arr[i];
+            s = s.replaceAll("[^A-Za-z0-9 ]", ""); // step 1: using to remove non-alphanumeric characters, using ... to
             // preserve spaces
-            // step 2: using ... to make text title case
-            // step 3: using ... to remove spaces at beginning and end, using ... to remove
-            // duplicate spaces
-            // step 4: assigning result to placeholderForModifiedPhrase
-            // step 5: using ... to determine middle
-            // step 6: using ... to get up to the middle 3 characters
-            // step 7: using ... to ensure the middle characters exclude first and last of 
-            // word/phrase
-            // step 8: assigning to placeholderForMiddleCharacters
-            
+            s = s.trim().replaceAll("\\s+", " ");
+            String[] words = s.split(" ");
+            StringBuilder title = new StringBuilder();
+            for (int w = 0; w < words.length; w++) {
+                String word = words[w];
+                if (word.length() > 0) {
+                    char first = Character.toUpperCase(word.charAt(0)); // step 2: using to make text title case
+                    String rest = (word.length() > 1) ? word.substring(1).toLowerCase() : "";
+                    title.append(first).append(rest);// step 3: using to remove spaces at beginning and end, and to remove
+                                                    // duplicate spaces
+                        if (w < words.length - 1) title.append(" ");
+                }
+            }
+            placeholderForModifiedPhrase = title.toString(); // step 4: assigning result to placeholderForModifiedPhrase
+            // step 6: using to get up to the middle 3 characters
+            String phrase = placeholderForModifiedPhrase;
+            if (phrase.length() < 3) {
+                placeholderForMiddleCharacters = "Not enough characters";
+            } else {
+            int mid = phrase.length() / 2; // start at the middle
+            if (mid + 3 <= phrase.length()) {
+                placeholderForMiddleCharacters = phrase.substring(mid, mid + 3); // step 7: using ... to ensure the middle characters exclude first and last of 
+                                                                                // word/phrase
+            } else {
+                placeholderForMiddleCharacters = "Not enough characters";
+            }
+        }
              // End Solution Edits
             System.out.println(String.format("Index[%d] \"%s\" | Middle: \"%s\"",i, placeholderForModifiedPhrase, placeholderForMiddleCharacters));
         }
