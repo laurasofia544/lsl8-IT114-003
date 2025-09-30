@@ -25,23 +25,20 @@ public class Problem3 extends BaseClass {
         // Step 5: Use ... to assign back to the same slot of the output array
         for (int i = 0; i < arr.length; i++) {
             Object v = arr[i];
-
-        if (v instanceof Integer) {
-            output[i] = Math.abs((Integer) v);   // Integer -> Integer
-        } else if (v instanceof Double) {
-            output[i] = Math.abs((Double) v);    // Double -> Double
-        } else if (v instanceof Float) {
-            output[i] = Math.abs((Float) v);     // Float -> Float
-        } else if (v instanceof String) {
-        // keep it a String; just remove a leading '-' if there is one
-            String s = (String) v;
-        if (s.startsWith("-")) s = s.substring(1);
-            output[i] = s;                       // String -> String
-        } else {
-        // Anything else: just copy over so it's not null
-            output[i] = v;
+            if (v instanceof Integer) {
+                output[i] = Math.abs((Integer) v);   
+            } else if (v instanceof Double) {
+                output[i] = Math.abs((Double) v);    
+            } else if (v instanceof Float) {
+                output[i] = Math.abs((Float) v);     
+            } else if (v instanceof String) {
+                String s = (String) v;
+            if (s.startsWith("-")) s = s.substring(1);
+                output[i] = s;                       
+            } else {
+                output[i] = v;
+            }
         }
-    }
         // End Solution Edits
         System.out.println("Output: ");
         printOutputWithType(output);
