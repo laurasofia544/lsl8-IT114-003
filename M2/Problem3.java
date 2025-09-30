@@ -18,12 +18,30 @@ public class Problem3 extends BaseClass {
         Object[] output = new Object[arr.length];
         // Start Solution Edits
         // lsl8 09/29/25
-        // Step 1: Iterate the arr by 
-        // Step 2: Use ... to check type
+        // Step 1: Iterate the arr by looping through each element
+        // Step 2: Use instanceof to check type
         // Step 3: Use ... to make positive
         // Step 4: Use ... to convert back to original type
         // Step 5: Use ... to assign back to the same slot of the output array
+        for (int i = 0; i < arr.length; i++) {
+            Object v = arr[i];
 
+        if (v instanceof Integer) {
+            output[i] = Math.abs((Integer) v);   // Integer -> Integer
+        } else if (v instanceof Double) {
+            output[i] = Math.abs((Double) v);    // Double -> Double
+        } else if (v instanceof Float) {
+            output[i] = Math.abs((Float) v);     // Float -> Float
+        } else if (v instanceof String) {
+        // keep it a String; just remove a leading '-' if there is one
+            String s = (String) v;
+        if (s.startsWith("-")) s = s.substring(1);
+            output[i] = s;                       // String -> String
+        } else {
+        // Anything else: just copy over so it's not null
+            output[i] = v;
+        }
+    }
         // End Solution Edits
         System.out.println("Output: ");
         printOutputWithType(output);
