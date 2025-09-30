@@ -17,7 +17,12 @@ public class Problem3 extends BaseClass {
         // Step 3: Add code to solve the problem (add/commit as needed)
         Object[] output = new Object[arr.length];
         // Start Solution Edits
-        
+        // lsl8 09/29/25
+        // Step 1: Iterate the arr by 
+        // Step 2: Use ... to check type
+        // Step 3: Use ... to make positive
+        // Step 4: Use ... to convert back to original type
+        // Step 5: Use ... to assign back to the same slot of the output array
 
         // End Solution Edits
         System.out.println("Output: ");
