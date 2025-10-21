@@ -206,6 +206,21 @@ public class ServerThread extends Thread {
                         server.handleFlipText(this);
                         wasCommand = true;
                         break;
+                    //lsl 10/20/25
+                    case "pm":
+                        if (commandData.length >=4){
+                            try{
+                                long targetId = Long.parseLong(commandData[2].trim());
+                                String pmText = String.join(" ", Arrays.copyOfRange(commandData, 3, commandData.length));
+                                server.handlePrivateMessage(this, targetId, pmText);
+                            } catch (NumberFormatException nfe){
+                                this.sendToClient("Server: Invalid target id for /pm");
+                            }
+                        } else{
+                            this.sendToClient("Server: Format: /pm <targetId> <message>");
+                        }
+                        wasCommand = true;
+                        break;
                     // added more cases/breaks as needed for other commands
                     default:
                         break;

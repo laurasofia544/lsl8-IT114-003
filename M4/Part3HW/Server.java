@@ -126,11 +126,28 @@ public class Server {
         String rev = sb.toString();
         relay(sender, rev);
     }
+    //lsl8 10/20/25
     protected synchronized void handleFlipText(ServerThread sender) {
         String result = Math.random() < 0.5 ? "heads" : "tails";
         String msg = "User[" + sender.getClientId() + "] flipped a coin and got " + result;
         relay(null, msg);
 }
+    //lsl8 10/20/25
+    protected synchronized void handlePrivateMessage(ServerThread sender, long targetId, String text) {
+        final String payload = "Server: PM from User[" + sender.getClientId() + "]: " + text;
+        if (sender != null && sender.isRunning()) {
+            sender.sendToClient(payload);
+        }
+        ServerThread receiver = connectedClients.get(targetId);
+        if (receiver != null && receiver.isRunning()) {
+            receiver.sendToClient(payload);
+        } else {
+            if (sender != null && sender.isRunning()) {
+            sender.sendToClient("Server: User[" + targetId + "] not found (PM not delivered)");
+            }
+        }
+    }
+
 
 
     protected synchronized void handleMessage(ServerThread sender, String text) {
