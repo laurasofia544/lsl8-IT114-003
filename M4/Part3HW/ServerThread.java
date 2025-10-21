@@ -221,6 +221,16 @@ public class ServerThread extends Thread {
                         }
                         wasCommand = true;
                         break;
+                    //lsl8 10/20/25
+                    case "shuffle":
+                        if (commandData.length >=3){
+                            String textToShuffle = String.join(" ", Arrays.copyOfRange(commandData, 2, commandData.length));
+                            server.handleShuffleText(this, textToShuffle);
+                        } else {
+                            this.sendToClient("Server: Format: /shuffle <message>");
+                        }
+                        wasCommand = true;
+                        break;
                     // added more cases/breaks as needed for other commands
                     default:
                         break;

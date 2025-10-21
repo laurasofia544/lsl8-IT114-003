@@ -138,6 +138,17 @@ public class Client {
             System.out.println("Usage: /pm <targetId> <message>");
         }
         wasCommand = true;
+        //lsl8 10/20/25
+        } else if (text.trim().toLowerCase().startsWith("/shuffle ")) {
+            String[] parts = text.trim().split("\\s+", 2);
+            if (parts.length >= 2) {
+                String msg = parts[1].trim();
+                String payload = Constants.COMMAND_TRIGGER + ",shuffle," + msg;
+                sendToServer(payload);
+            } else {
+                System.out.println("Format: /shuffle <message>");
+            }
+            wasCommand = true;
         }
         return wasCommand;
     }

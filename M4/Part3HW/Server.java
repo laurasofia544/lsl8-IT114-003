@@ -147,6 +147,21 @@ public class Server {
             }
         }
     }
+    //lsl8 10/20/25
+    protected synchronized void handleShuffleText(ServerThread sender, String text) {
+        char[] arr = text.toCharArray();
+        java.util.Random rnd = new java.util.Random();
+        for (int i = arr.length - 1; i > 0; i--) {
+            int j = rnd.nextInt(i + 1);
+            char tmp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = tmp;
+        }
+        String shuffled = new String(arr);
+        String msg = "Shuffled from User[" + sender.getClientId() + "]: " + shuffled;
+        relay(null, msg);
+}
+
 
 
 
