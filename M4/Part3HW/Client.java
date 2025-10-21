@@ -1,4 +1,4 @@
-package M4.Part3;
+package M4.Part3HW;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import M4.Part3.TextFX.Color;
+import M4.Part3HW.TextFX.Color;
 
 /**
  * Demoing bi-directional communication between client and server in a
@@ -119,6 +119,11 @@ public class Client {
             text = text.replace("/reverse", "").trim();
             // index 0 = trigger, index 1 = command, index N = command data
             String[] commandData = { Constants.COMMAND_TRIGGER, "reverse", text };
+            sendToServer(String.join(",", commandData));
+            wasCommand = true;
+            //lsl8 10/20/25
+        } else if ("/flip".equalsIgnoreCase(text.trim())){
+            String [] commandData = { Constants.COMMAND_TRIGGER, "flip"};
             sendToServer(String.join(",", commandData));
             wasCommand = true;
         }

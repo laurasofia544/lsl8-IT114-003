@@ -1,4 +1,4 @@
-package M4.Part3;
+package M4.Part3HW;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-import M4.Part3.TextFX.Color;
+import M4.Part3HW.TextFX.Color;
 
 /**
  * A server-side representation of a single client
@@ -199,6 +199,11 @@ public class ServerThread extends Thread {
                         // ignore the first two indexes (trigger, command)
                         String relevantText = String.join(" ", Arrays.copyOfRange(commandData, 2, commandData.length));
                         server.handleReverseText(this, relevantText);
+                        wasCommand = true;
+                        break;
+                    //lsl8 10/20/25
+                    case "flip":
+                        server.handleFlipText(this);
                         wasCommand = true;
                         break;
                     // added more cases/breaks as needed for other commands

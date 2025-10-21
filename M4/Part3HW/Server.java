@@ -1,4 +1,4 @@
-package M4.Part3;
+package M4.Part3HW;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -126,6 +126,12 @@ public class Server {
         String rev = sb.toString();
         relay(sender, rev);
     }
+    protected synchronized void handleFlipText(ServerThread sender) {
+        String result = Math.random() < 0.5 ? "heads" : "tails";
+        String msg = "User[" + sender.getClientId() + "] flipped a coin and got " + result;
+        relay(null, msg);
+}
+
 
     protected synchronized void handleMessage(ServerThread sender, String text) {
         relay(sender, text);
