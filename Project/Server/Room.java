@@ -1,12 +1,14 @@
 package Project.Server;
 
 import java.util.concurrent.ConcurrentHashMap;
-
-import Project.Common.TextFX.Color;
+import Project.Common.RoomAction;
 import Project.Common.Constants;
+import Project.Common.TextFX;
+import Project.Common.TextFX.Color;
 import Project.Exception.DuplicateRoomException;
 import Project.Exception.RoomNotFoundException;
-import Project.Server.Server.BaseServerThread;
+import Project.Server.ServerThread;
+
 
 public class Room implements AutoCloseable {
     private final String name;// unique name of the Room
@@ -76,7 +78,7 @@ public class Room implements AutoCloseable {
             }
         });
     }
-
+//lsl8 11/03/25 Relays messages and status to all clients
     private void joinStatusRelay(ServerThread client, boolean didJoin) {
         clientsInRoom.values().removeIf(serverThread -> {
             String formattedMessage = String.format("Room[%s] %s %s the room",
@@ -99,7 +101,7 @@ public class Room implements AutoCloseable {
         });
     }
 
-    /**
+    /**lsl8 11/03/25
      * Sends a basic String message from the sender to all connectedClients
      * Internally calls processCommand and evaluates as necessary.
      * Note: Clients that fail to receive a message get removed from
@@ -259,7 +261,7 @@ public class Room implements AutoCloseable {
         String rev = sb.toString();
         relay(sender, rev);
     }
-
+//lsl8 11/03/25 Replay Messages
     protected synchronized void handleMessage(ServerThread sender, String text) {
         relay(sender, text);
     }

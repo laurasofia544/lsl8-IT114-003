@@ -1,5 +1,7 @@
-package M5.Part5;
+package Project.Server;
 
+import Project.Common.User;
+import Project.Common.Payload;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -126,6 +128,7 @@ public abstract class BaseServerThread extends Thread {
     /**
      * Terminates the server-side of the connection
      */
+    //lsl8 11/03 termination
     protected void disconnect() {
         if (!isRunning) {
             // prevent multiple triggers if this gets called consecutively
@@ -136,7 +139,7 @@ public abstract class BaseServerThread extends Thread {
         this.interrupt(); // breaks out of blocking read in the run() method
         cleanup(); // good practice to ensure data is written out immediately
     }
-
+// lsl8 11/03/25 handling each client
     @Override
     public void run() {
         info("Thread starting");

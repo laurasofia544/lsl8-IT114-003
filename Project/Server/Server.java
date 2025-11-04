@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ConcurrentHashMap;
-
+import Project.Common.TextFX;
 import Project.Common.TextFX.Color;
 import Project.Exception.DuplicateRoomException;
 import Project.Exception.RoomNotFoundException;
@@ -47,7 +47,7 @@ public enum Server {
             e.printStackTrace();
         }
     }
-
+//lsl8 11/03/25 Snippet of code where Server is listening and waiting for connections
     private void start(int port) {
         this.port = port;
         // server listening
@@ -106,6 +106,7 @@ public enum Server {
      * @return true if it was created and false if it wasn't
      * @throws DuplicateRoomException
      */
+//lsl8 11/03/25 Snippet of CreateRoom
     protected void createRoom(String name) throws DuplicateRoomException {
         final String nameCheck = name.toLowerCase();
         if (rooms.containsKey(nameCheck)) {
@@ -124,6 +125,7 @@ public enum Server {
      * @throws RoomNotFoundException
      * 
      */
+//lsl8 11/03/25 Snippet of joinRoom
     protected void joinRoom(String name, ServerThread client) throws RoomNotFoundException {
         final String nameCheck = name.toLowerCase();
         if (!rooms.containsKey(nameCheck)) {
@@ -137,7 +139,7 @@ public enum Server {
         Room next = rooms.get(nameCheck);
         next.addClient(client);
     }
-
+//lsl8 11/03/25 Snippet of RemoveRoom 
     protected void removeRoom(Room room) {
         rooms.remove(room.getName().toLowerCase());
         info(String.format("Removed room %s", room.getName()));

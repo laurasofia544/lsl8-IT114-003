@@ -3,8 +3,16 @@ package Project.Server;
 import java.net.Socket;
 import java.util.Objects;
 import java.util.function.Consumer;
+import Project.Common.ConnectionPayload;
+import Project.Common.Constants;
+import Project.Common.Payload;
+import Project.Common.PayloadType;
+import Project.Common.RoomAction;
+import Project.Common.TextFX;
 import Project.Common.TextFX.Color;
-import Project.Server.Server.BaseServerThread;
+import Project.Server.Room;
+import Project.Server.BaseServerThread;    // ensure this is the path used
+
 
 /**
  * A server-side representation of a single client
@@ -133,8 +141,8 @@ public class ServerThread extends BaseServerThread {
         switch (incoming.getPayloadType()) {
             case CLIENT_CONNECT:
                 setClientName(((ConnectionPayload) incoming).getClientName().trim());
-
                 break;
+    //lsl8 11/03/25 disconnect payLoad
             case DISCONNECT:
                 currentRoom.handleDisconnect(this);
                 break;
