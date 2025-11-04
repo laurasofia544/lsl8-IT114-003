@@ -10,8 +10,16 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import Project.Common.Command;
+import Project.Common.ConnectionPayload;
+import Project.Common.Constants;
+import Project.Common.Payload;
+import Project.Common.PayloadType;
+import Project.Common.RoomAction;
+import Project.Common.TextFX;
 import Project.Common.TextFX.Color;
+import Project.Common.User;
+
 
 /**
  * Demoing bi-directional communication between client and server in a
@@ -107,6 +115,7 @@ public enum Client {
      * @return true if the text was a command or triggered a command
      * @throws IOException
      */
+//lsl8 11/03/25 Handling the user's name before connecting to the server
     private boolean processClientCommand(String text) throws IOException {
         boolean wasCommand = false;
         if (text.startsWith(Constants.COMMAND_TRIGGER)) {
@@ -152,6 +161,7 @@ public enum Client {
                 text = text.replace(Command.REVERSE.command, "").trim();
                 sendReverse(text);
                 wasCommand = true;
+        //lsl8 11/03/25 Create and Join Room Commands
             } else if (text.startsWith(Command.CREATE_ROOM.command)) {
                 text = text.replace(Command.CREATE_ROOM.command, "").trim();
                 if (text == null || text.length() == 0) {
@@ -191,13 +201,13 @@ public enum Client {
         Payload payload = new Payload();
         payload.setMessage(roomName);
         switch (roomAction) {
-            case RoomAction.CREATE:
+            case CREATE:
                 payload.setPayloadType(PayloadType.ROOM_CREATE);
                 break;
-            case RoomAction.JOIN:
+            case JOIN:
                 payload.setPayloadType(PayloadType.ROOM_JOIN);
                 break;
-            case RoomAction.LEAVE:
+            case LEAVE:
                 payload.setPayloadType(PayloadType.ROOM_LEAVE);
                 break;
             default:
@@ -220,7 +230,7 @@ public enum Client {
         sendToServer(payload);
 
     }
-
+//lsl8 11/03/25 Sends the disconnect action to the server side 
     /**
      * Sends a disconnect action to the server
      * 
@@ -231,7 +241,7 @@ public enum Client {
         payload.setPayloadType(PayloadType.DISCONNECT);
         sendToServer(payload);
     }
-
+//lsl8 11/03/25 String Message
     /**
      * Sends a message to the server
      * 
@@ -341,7 +351,7 @@ public enum Client {
 
         }
     }
-
+//lsl8 11/03/25 Client receives confirmation and logs "connected"
     // Start process*() methods
     private void processClientData(Payload payload) {
         if (myUser.getClientId() != Constants.DEFAULT_CLIENT_ID) {
@@ -353,7 +363,7 @@ public enum Client {
         knownClients.put(myUser.getClientId(), myUser);
         System.out.println(TextFX.colorize("Connected", Color.GREEN));
     }
-
+//lsl8 11/03/25 how the client processes disconnect
     private void processDisconnect(Payload payload) {
         if (payload.getClientId() == myUser.getClientId()) {
             knownClients.clear();

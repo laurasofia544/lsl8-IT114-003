@@ -1,4 +1,4 @@
-package M5.Part5;
+package Project.Common;
 
 public class ConnectionPayload extends Payload {
     private String clientName;

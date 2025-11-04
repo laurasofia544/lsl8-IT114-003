@@ -1,4 +1,4 @@
-package M5.Part5;
+package Project.Common;
 
 public enum RoomAction {
     CREATE, JOIN, LEAVE
