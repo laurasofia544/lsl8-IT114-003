@@ -106,16 +106,24 @@ public enum Server {
      * @return true if it was created and false if it wasn't
      * @throws DuplicateRoomException
      */
-//lsl8 11/03/25 Snippet of CreateRoom
+//lsl8 11/24/25 Create GameRoom
     protected void createRoom(String name) throws DuplicateRoomException {
-        final String nameCheck = name.toLowerCase();
-        if (rooms.containsKey(nameCheck)) {
-            throw new DuplicateRoomException(String.format("Room %s already exists", name));
-        }
-        Room room = new Room(name);
-        rooms.put(nameCheck, room);
-        info(String.format("Created new Room %s", name));
+    String key = name.toLowerCase();
+
+    if (rooms.containsKey(key)) {
+        throw new DuplicateRoomException(String.format("Room %s already exists", name));
     }
+
+    Room room;
+    if (Room.LOBBY.equalsIgnoreCase(name)) {
+        room = new Room(Room.LOBBY);   // lobby stays a normal chat room
+    } else {
+        room = new GameRoom(name);     // all other rooms are game rooms in MS2
+    }
+
+    rooms.put(key, room);
+}
+
 
     /**
      * Attempts to move a client (ServerThread) between rooms

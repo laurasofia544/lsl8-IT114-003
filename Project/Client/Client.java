@@ -15,6 +15,7 @@ import Project.Common.ConnectionPayload;
 import Project.Common.Constants;
 import Project.Common.Payload;
 import Project.Common.PayloadType;
+import Project.Common.PointsPayload;
 import Project.Common.RoomAction;
 import Project.Common.TextFX;
 import Project.Common.TextFX.Color;
@@ -116,77 +117,109 @@ public enum Client {
      * @throws IOException
      */
 //lsl8 11/03/25 Handling the user's name before connecting to the server
-    private boolean processClientCommand(String text) throws IOException {
-        boolean wasCommand = false;
-        if (text.startsWith(Constants.COMMAND_TRIGGER)) {
-            text = text.substring(1); // remove the /
-            // System.out.println("Checking command: " + text);
-            if (isConnection("/" + text)) {
-                if (myUser.getClientName() == null || myUser.getClientName().isEmpty()) {
-                    System.out.println(
-                            TextFX.colorize("Please set your name via /name <name> before connecting", Color.RED));
-                    return true;
-                }
-                // replaces multiple spaces with a single space
-                // splits on the space after connect (gives us host and port)
-                // splits on : to get host as index 0 and port as index 1
-                String[] parts = text.trim().replaceAll(" +", " ").split(" ")[1].split(":");
-                connect(parts[0].trim(), Integer.parseInt(parts[1].trim()));
-                sendClientName(myUser.getClientName());// sync follow-up data (handshake)
-                wasCommand = true;
-            } else if (text.startsWith(Command.NAME.command)) {
-                text = text.replace(Command.NAME.command, "").trim();
-                if (text == null || text.length() == 0) {
-                    System.out.println(TextFX.colorize("This command requires a name as an argument", Color.RED));
-                    return true;
-                }
-                myUser.setClientName(text);// temporary until we get a response from the server
-                System.out.println(TextFX.colorize(String.format("Name set to %s", myUser.getClientName()),
-                        Color.YELLOW));
-                wasCommand = true;
-            } else if (text.equalsIgnoreCase(Command.LIST_USERS.command)) {
-                System.out.println(TextFX.colorize("Known clients:", Color.CYAN));
-                knownClients.forEach((key, value) -> {
-                    System.out.println(TextFX.colorize(String.format("%s%s", value.getDisplayName(),
-                            key == myUser.getClientId() ? " (you)" : ""), Color.CYAN));
-                });
-                wasCommand = true;
-            } else if (Command.QUIT.command.equalsIgnoreCase(text)) {
-                close();
-                wasCommand = true;
-            } else if (Command.DISCONNECT.command.equalsIgnoreCase(text)) {
-                sendDisconnect();
-                wasCommand = true;
-            } else if (text.startsWith(Command.REVERSE.command)) {
-                text = text.replace(Command.REVERSE.command, "").trim();
-                sendReverse(text);
-                wasCommand = true;
-        //lsl8 11/03/25 Create and Join Room Commands
-            } else if (text.startsWith(Command.CREATE_ROOM.command)) {
-                text = text.replace(Command.CREATE_ROOM.command, "").trim();
-                if (text == null || text.length() == 0) {
-                    System.out.println(TextFX.colorize("This command requires a room name as an argument", Color.RED));
-                    return true;
-                }
-                sendRoomAction(text, RoomAction.CREATE);
-                wasCommand = true;
-            } else if (text.startsWith(Command.JOIN_ROOM.command)) {
-                text = text.replace(Command.JOIN_ROOM.command, "").trim();
-                if (text == null || text.length() == 0) {
-                    System.out.println(TextFX.colorize("This command requires a room name as an argument", Color.RED));
-                    return true;
-                }
-                sendRoomAction(text, RoomAction.JOIN);
-                wasCommand = true;
-            } else if (text.startsWith(Command.LEAVE_ROOM.command) || text.startsWith("leave")) {
-                // Note: Accounts for /leave and /leaveroom variants (or anything beginning with
-                // /leave)
-                sendRoomAction(text, RoomAction.LEAVE);
-                wasCommand = true;
+    // lsl8 | 11/24/25 - Controller for client commands
+private boolean processClientCommand(String text) throws IOException {
+    boolean wasCommand = false;
+
+    if (text.startsWith(Constants.COMMAND_TRIGGER)) {
+        text = text.substring(1);
+
+        if (isConnection("/" + text)) {
+            if (myUser.getClientName() == null || myUser.getClientName().isEmpty()) {
+                System.out.println(
+                        TextFX.colorize("Please set your name via /name <name> before connecting", Color.RED));
+                return true;
             }
+
+            String[] parts = text.trim().replaceAll(" +", " ").split(" ")[1].split(":");
+            connect(parts[0].trim(), Integer.parseInt(parts[1].trim()));
+            sendClientName(myUser.getClientName());
+            wasCommand = true;
+
+        } else if (text.startsWith(Command.NAME.command)) {
+            text = text.replace(Command.NAME.command, "").trim();
+            if (text == null || text.length() == 0) {
+                System.out.println(TextFX.colorize("This command requires a name as an argument", Color.RED));
+                return true;
+            }
+            myUser.setClientName(text);
+            System.out.println(TextFX.colorize(
+                    String.format("Name set to %s", myUser.getClientName()), Color.YELLOW));
+            wasCommand = true;
+
+        } else if (text.equalsIgnoreCase(Command.LIST_USERS.command)) {
+            System.out.println(TextFX.colorize("Known clients:", Color.CYAN));
+            knownClients.forEach((key, value) -> {
+                System.out.println(TextFX.colorize(
+                        String.format("%s%s", value.getDisplayName(),
+                                key == myUser.getClientId() ? " (you)" : ""), Color.CYAN));
+            });
+            wasCommand = true;
+
+        } else if (Command.QUIT.command.equalsIgnoreCase(text)) {
+            close();
+            wasCommand = true;
+
+        } else if (Command.DISCONNECT.command.equalsIgnoreCase(text)) {
+            sendDisconnect();
+            wasCommand = true;
+
+        } else if (text.startsWith(Command.REVERSE.command)) {
+            text = text.replace(Command.REVERSE.command, "").trim();
+            sendReverse(text);
+            wasCommand = true;
+
+        } else if (text.startsWith(Command.CREATE_ROOM.command)) {
+            text = text.replace(Command.CREATE_ROOM.command, "").trim();
+            if (text == null || text.length() == 0) {
+                System.out.println(TextFX.colorize(
+                        "This command requires a room name as an argument", Color.RED));
+                return true;
+            }
+            sendRoomAction(text, RoomAction.CREATE);
+            wasCommand = true;
+
+        } else if (text.startsWith(Command.JOIN_ROOM.command)) {
+            text = text.replace(Command.JOIN_ROOM.command, "").trim();
+            if (text == null || text.length() == 0) {
+                System.out.println(TextFX.colorize(
+                        "This command requires a room name as an argument", Color.RED));
+                return true;
+            }
+            sendRoomAction(text, RoomAction.JOIN);
+            wasCommand = true;
+
+        } else if (text.startsWith(Command.LEAVE_ROOM.command) || text.startsWith("leave")) {
+            sendRoomAction(text, RoomAction.LEAVE);
+            wasCommand = true;
+
+        } else if (text.equalsIgnoreCase("ready")) {
+            Payload p = new Payload();
+            p.setPayloadType(PayloadType.READY);
+            sendToServer(p);
+            wasCommand = true;
+
+        } else if (text.startsWith("pick ")) {
+            String arg = text.substring(5).trim().toLowerCase();
+            Payload p = new Payload();
+            p.setPayloadType(PayloadType.CHOICE_PICKED);
+            p.setMessage(arg);
+            sendToServer(p);
+            wasCommand = true;
+
+        } else if (text.equalsIgnoreCase("score")) {
+            Payload p = new Payload();
+            p.setPayloadType(PayloadType.POINTS_SYNC);
+            p.setMessage("request");
+            sendToServer(p);
+            wasCommand = true;
         }
-        return wasCommand;
-    }
+    } else {
+    System.out.println(TextFX.colorize("Unknown command: /" + text, Color.YELLOW));
+    wasCommand = true;
+}
+    return wasCommand;
+}
 
     // Start Send*() methods
 
@@ -317,40 +350,68 @@ public enum Client {
         }
         System.out.println("listenToServer thread stopped");
     }
-
+//lsl8 | 11/24/25
     private void processPayload(Payload payload) {
-        switch (payload.getPayloadType()) {
-            case CLIENT_CONNECT:// unused
-                break;
-            case CLIENT_ID:
-                processClientData(payload);
-                break;
-            case DISCONNECT:
-                processDisconnect(payload);
-                break;
-            case MESSAGE:
-                processMessage(payload);
-                break;
-            case REVERSE:
-                processReverse(payload);
-                break;
-            case ROOM_CREATE: // unused
-                break;
-            case ROOM_JOIN:
-                processRoomAction(payload);
-                break;
-            case ROOM_LEAVE:
-                processRoomAction(payload);
-                break;
-            case SYNC_CLIENT:
-                processRoomAction(payload);
-                break;
-            default:
-                System.out.println(TextFX.colorize("Unhandled payload type", Color.YELLOW));
-                break;
+    switch (payload.getPayloadType()) {
+        case CLIENT_CONNECT:
+            break;
+        case CLIENT_ID:
+            processClientData(payload);
+            break;
+        case DISCONNECT:
+            processDisconnect(payload);
+            break;
+        case MESSAGE:
+            processMessage(payload);
+            break;
+        case REVERSE:
+            processReverse(payload);
+            break;
+        case ROOM_JOIN:
+        case ROOM_LEAVE:
+        case SYNC_CLIENT:
+            processRoomAction(payload);
+            break;
+        case CHOICE_PICKED:
+        // Server says someone picked (without revealing their choice)
+            System.out.println(
+            TextFX.colorize(payload.getMessage(), Color.YELLOW));
+            break;
 
-        }
+        case ROUND_START:
+            // server sends "Round started! Make your pick..."
+            System.out.println(TextFX.colorize(payload.getMessage(), Color.GREEN));
+            break;
+        case PICKED_NOTICE:
+            System.out.println(TextFX.colorize(payload.getMessage(), Color.YELLOW));
+            break;
+        case BATTLE_RESULT:
+            System.out.println(TextFX.colorize(payload.getMessage(), Color.BLUE));
+            break;
+        case POINTS_SYNC:
+            if (payload instanceof PointsPayload) {
+                PointsPayload pp = (PointsPayload) payload;
+                System.out.println(TextFX.colorize(
+                    String.format("Points update -> %s: %d",
+                        knownClients.containsKey(pp.getTargetClientId())
+                            ? knownClients.get(pp.getTargetClientId()).getDisplayName()
+                            : ("#" + pp.getTargetClientId()),
+                        pp.getPoints()
+                    ),
+                    Color.CYAN
+                ));
+            } else {
+                System.out.println(TextFX.colorize(payload.getMessage(), Color.CYAN));
+            }
+            break;
+        case GAME_OVER:
+            System.out.println(TextFX.colorize(payload.getMessage(), Color.YELLOW));
+            break;
+        default:
+            System.out.println(TextFX.colorize("Unhandled payload type -> " + payload.getPayloadType(),Color.YELLOW));
+        break;
     }
+}
 //lsl8 11/03/25 Client receives confirmation and logs "connected"
     // Start process*() methods
     private void processClientData(Payload payload) {
@@ -394,7 +455,6 @@ public enum Client {
         switch (connectionPayload.getPayloadType()) {
 
             case ROOM_LEAVE:
-                // remove from map
                 if (knownClients.containsKey(connectionPayload.getClientId())) {
                     knownClients.remove(connectionPayload.getClientId());
                 }
@@ -407,9 +467,7 @@ public enum Client {
                 if (connectionPayload.getMessage() != null) {
                     System.out.println(TextFX.colorize(connectionPayload.getMessage(), Color.GREEN));
                 }
-                // cascade to manage knownClients
             case SYNC_CLIENT:
-                // add to map
                 if (!knownClients.containsKey(connectionPayload.getClientId())) {
                     User user = new User();
                     user.setClientId(connectionPayload.getClientId());
@@ -437,7 +495,7 @@ public enum Client {
      */
     private void listenToInput() {
         try (Scanner si = new Scanner(System.in)) {
-            System.out.println("Waiting for input"); // moved here to avoid console spam
+            System.out.println("Waiting for input");
             while (isRunning) { // Run until isRunning is false
                 String userInput = si.nextLine();
                 if (!processClientCommand(userInput)) {
