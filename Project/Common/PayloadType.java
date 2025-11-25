@@ -1,14 +1,22 @@
 package Project.Common;
 
+// lsl8 | 11/24/25 | new payload types added
 public enum PayloadType {
-    CLIENT_CONNECT, // client requesting to connect to server (passing of initialization data
-                    // [name])
-    CLIENT_ID, // server sending client id
-    SYNC_CLIENT, // silent syncing of clients in room
-    DISCONNECT, // distinct disconnect action
+    CLIENT_CONNECT,
+    CLIENT_ID,
+    DISCONNECT,
+    MESSAGE,
+    REVERSE,
     ROOM_CREATE,
     ROOM_JOIN,
     ROOM_LEAVE,
-    REVERSE,
-    MESSAGE // sender and message
+    SYNC_CLIENT,
+
+    READY,       
+    ROUND_START,    
+    CHOICE_PICKED, 
+    PICKED_NOTICE, 
+    BATTLE_RESULT, 
+    POINTS_SYNC,
+    GAME_OVER 
 }

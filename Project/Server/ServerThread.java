@@ -51,6 +51,14 @@ public class ServerThread extends BaseServerThread {
     }
 
     // Start Send*() Methods
+    // lsl8 | 11/24/25 | send round-start notice
+protected boolean sendRoundStart(String msg) {
+        Payload p = new Payload();
+        p.setPayloadType(PayloadType.ROUND_START);
+        p.setClientId(Constants.DEFAULT_CLIENT_ID);
+        p.setMessage(msg);
+        return sendToClient(p);
+    }
     protected boolean sendDisconnect(long clientId) {
         Payload payload = new Payload();
         payload.setClientId(clientId);
@@ -133,6 +141,40 @@ public class ServerThread extends BaseServerThread {
         payload.setClientId(clientId);
         return sendToClient(payload);
     }
+    // lsl8 | 11/24/25 | send helpers
+    protected boolean sendRoundStart() {
+        Payload p = new Payload();
+        p.setPayloadType(PayloadType.ROUND_START);
+        p.setClientId(Constants.DEFAULT_CLIENT_ID);
+        p.setMessage("Round started! Make your pick with /pick r|p|s");
+        return sendToClient(p);
+    }
+    // lsl8 | 11/24/25 | MS2 notice helper
+    protected boolean sendPickedNotice(String msg) {
+        Payload p = new Payload();
+        p.setPayloadType(PayloadType.PICKED_NOTICE);
+        p.setClientId(Constants.DEFAULT_CLIENT_ID);
+        p.setMessage(msg);
+        return sendToClient(p);
+    }
+        
+
+    protected boolean sendBattleResult(String msg) {
+        Payload p = new Payload();
+        p.setPayloadType(PayloadType.BATTLE_RESULT);
+        p.setClientId(Constants.DEFAULT_CLIENT_ID);
+        p.setMessage(msg);
+        return sendToClient(p);
+    }
+
+    protected boolean sendGameOver(String msg) {
+        Payload p = new Payload();
+        p.setPayloadType(PayloadType.GAME_OVER);
+        p.setClientId(Constants.DEFAULT_CLIENT_ID);
+        p.setMessage(msg);
+        return sendToClient(p);
+    }
+
 
     // End Send*() Methods
     @Override
@@ -161,12 +203,31 @@ public class ServerThread extends BaseServerThread {
             case ROOM_LEAVE:
                 currentRoom.handleJoinRoom(this, Room.LOBBY);
                 break;
+            // lsl8 | 11/24/25
+            case READY:
+                if (currentRoom instanceof GameRoom) {
+                ((GameRoom) currentRoom).handleReady(this);
+                } else {
+                    sendMessage(Constants.DEFAULT_CLIENT_ID, "You must be in a game room to /ready");
+                }
+                break;
+            case CHOICE_PICKED:
+                if (currentRoom instanceof GameRoom) {
+                ((GameRoom) currentRoom).handlePick(this, incoming.getMessage());
+                } else {
+                    sendMessage(Constants.DEFAULT_CLIENT_ID, "You must be in a game room to /pick");
+                }
+                break;
+            case POINTS_SYNC:
+                if (currentRoom instanceof GameRoom) {
+                ((GameRoom) currentRoom).handleScoreRequest(this);
+                }
+                break;
             default:
                 System.out.println(TextFX.colorize("Unknown payload type received", Color.RED));
                 break;
         }
     }
-
     @Override
     protected void onInitialized() {
         // once receiving the desired client name the object is ready
