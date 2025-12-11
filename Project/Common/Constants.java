@@ -4,4 +4,7 @@ public abstract class Constants {
     final public static String COMMAND_TRIGGER = "/";
     final public static String SINGLE_SPACE = " ";
     final public static long DEFAULT_CLIENT_ID = -1;
+    final public static long GAME_EVENT_CHANNEL = -999;
+    public static final String NOT_CONNECTED = "Not Connected";
+    public static final String LOBBY = "lobby";
 }

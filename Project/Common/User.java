@@ -4,40 +4,52 @@ public class User {
     private long clientId = Constants.DEFAULT_CLIENT_ID;
     private String clientName;
 
-    /**
-     * @return the clientId
-     */
-    public long getClientId() {
-        return clientId;
-    }
+    private boolean ready = false;
+    private boolean tookTurn = false;
+    private int points = -1;
 
-    /**
-     * @param clientId the clientId to set
-     */
-    public void setClientId(long clientId) {
-        this.clientId = clientId;
-    }
+    public long getClientId() { return clientId; }
+    public void setClientId(long clientId) { this.clientId = clientId; }
 
-    /**
-     * @return the username
-     */
-    public String getClientName() {
-        return clientName;
-    }
-
-    /**
-     * @param username the username to set
-     */
-    public void setClientName(String username) {
-        this.clientName = username;
-    }
+    public String getClientName() { return clientName; }
+    public void setClientName(String clientName) { this.clientName = clientName; }
 
     public String getDisplayName() {
-        return String.format("%s#%s", this.clientName, this.clientId);
+        if (clientName == null || clientName.isEmpty()) {
+            return String.format("#%d", clientId);
+        }
+        return String.format("%s#%d", clientName, clientId);
     }
 
     public void reset() {
-        this.clientId = Constants.DEFAULT_CLIENT_ID;
-        this.clientName = null;
+        clientId = Constants.DEFAULT_CLIENT_ID;
+        clientName = null;
+        ready = false;
+        tookTurn = false;
+        points = -1;
+    }
+
+    public boolean isReady() {
+        return ready;
+    }
+
+    public void setReady(boolean ready) {
+        this.ready = ready;
+    }
+
+    public boolean didTakeTurn() {
+        return tookTurn;
+    }
+
+    public void setTookTurn(boolean tookTurn) {
+        this.tookTurn = tookTurn;
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public void setPoints(int points) {
+        this.points = points;
     }
 }

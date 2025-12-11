@@ -1,6 +1,6 @@
+//lsl8 | 12/07/25 New added
 package Project.Common;
 
-// lsl8 | 11/24/25 | new payload types added
 public enum PayloadType {
     CLIENT_CONNECT,
     CLIENT_ID,
@@ -12,11 +12,21 @@ public enum PayloadType {
     ROOM_LEAVE,
     SYNC_CLIENT,
 
-    READY,       
-    ROUND_START,    
-    CHOICE_PICKED, 
-    PICKED_NOTICE, 
-    BATTLE_RESULT, 
+    READY,          // ready up
+    CHOICE_PICKED,  // /pick r|p|s
+    ROUND_START,
+    PICKED_NOTICE,
+    BATTLE_RESULT,
     POINTS_SYNC,
-    GAME_OVER 
+    GAME_OVER,
+
+    ROOM_LIST,
+    SYNC_READY,
+    RESET_READY,
+    PHASE,
+    TURN,
+    SYNC_TURN,
+    RESET_TURN,
+    TIME,
+    POINTS
 }
