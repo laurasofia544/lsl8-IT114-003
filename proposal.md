@@ -14,4 +14,4 @@
 - Milestone 3
 - https://github.com/laurasofia544/lsl8-IT114-003/tree/Milestone3/Project
 - Demo Link
-  - (add youtube link to unlisted or public demo) Note you'll need to verify your youtube account to upload videos > 15mins
+- https://youtu.be/1F6jyhx4nWM
