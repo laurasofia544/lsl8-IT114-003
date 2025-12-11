@@ -30,7 +30,7 @@ public class Room implements AutoCloseable {
     public String getName() {
         return this.name;
     }
-
+//lsl8 11/24/25 
     protected synchronized void addClient(ServerThread client) {
         if (!isRunning) { // block action if Room isn't running
             return;
@@ -47,7 +47,7 @@ public class Room implements AutoCloseable {
         joinStatusRelay(client, true);
 
     }
-
+//lsl8 11/24/25
     protected synchronized void removeClient(ServerThread client) {
         if (!isRunning) { // block action if Room isn't running
             return;

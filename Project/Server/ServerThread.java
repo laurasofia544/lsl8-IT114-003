@@ -3,6 +3,7 @@ package Project.Server;
 import java.net.Socket;
 import java.util.Objects;
 import java.util.function.Consumer;
+
 import Project.Common.ConnectionPayload;
 import Project.Common.Constants;
 import Project.Common.Payload;
@@ -10,9 +11,6 @@ import Project.Common.PayloadType;
 import Project.Common.RoomAction;
 import Project.Common.TextFX;
 import Project.Common.TextFX.Color;
-import Project.Server.Room;
-import Project.Server.BaseServerThread;    // ensure this is the path used
-
 
 /**
  * A server-side representation of a single client
@@ -20,45 +18,28 @@ import Project.Server.BaseServerThread;    // ensure this is the path used
 public class ServerThread extends BaseServerThread {
     private Consumer<ServerThread> onInitializationComplete; // callback to inform when this object is ready
 
-    /**
-     * A wrapper method so we don't need to keep typing out the long/complex sysout
-     * line inside
-     * 
-     * @param message
-     */
     protected void info(String message) {
         System.out.println(TextFX.colorize(String.format("Thread[%s]: %s", this.getClientId(), message), Color.CYAN));
     }
 
-    /**
-     * Wraps the Socket connection and takes a Server reference and a callback
-     * 
-     * @param myClient
-     * @param server
-     * @param onInitializationComplete method to inform listener that this object is
-     *                                 ready
-     */
     protected ServerThread(Socket myClient, Consumer<ServerThread> onInitializationComplete) {
         Objects.requireNonNull(myClient, "Client socket cannot be null");
         Objects.requireNonNull(onInitializationComplete, "callback cannot be null");
         info("ServerThread created");
-        // get communication channels to single client
         this.client = myClient;
-        // this.clientId = this.threadId(); // An id associated with the thread
-        // instance, used as a temporary identifier
         this.onInitializationComplete = onInitializationComplete;
-
     }
 
     // Start Send*() Methods
-    // lsl8 | 11/24/25 | send round-start notice
-protected boolean sendRoundStart(String msg) {
+//lsl8 | 12/08/25 Round Start Message
+    protected boolean sendRoundStart(String msg) {
         Payload p = new Payload();
         p.setPayloadType(PayloadType.ROUND_START);
         p.setClientId(Constants.DEFAULT_CLIENT_ID);
         p.setMessage(msg);
         return sendToClient(p);
     }
+
     protected boolean sendDisconnect(long clientId) {
         Payload payload = new Payload();
         payload.setClientId(clientId);
@@ -70,28 +51,10 @@ protected boolean sendRoundStart(String msg) {
         return sendClientInfo(Constants.DEFAULT_CLIENT_ID, null, RoomAction.JOIN);
     }
 
-    /**
-     * Syncs Client Info (id, name, join status) to the client
-     * 
-     * @param clientId   use -1 for reset/clear
-     * @param clientName
-     * @param action     RoomAction of Join or Leave
-     * @return true for successful send
-     */
     protected boolean sendClientInfo(long clientId, String clientName, RoomAction action) {
         return sendClientInfo(clientId, clientName, action, false);
     }
 
-    /**
-     * Syncs Client Info (id, name, join status) to the client
-     * 
-     * @param clientId   use -1 for reset/clear
-     * @param clientName
-     * @param action     RoomAction of Join or Leave
-     * @param isSync     True is used to not show output on the client side (silent
-     *                   sync)
-     * @return true for successful send
-     */
     protected boolean sendClientInfo(long clientId, String clientName, RoomAction action, boolean isSync) {
         ConnectionPayload payload = new ConnectionPayload();
         switch (action) {
@@ -112,28 +75,14 @@ protected boolean sendRoundStart(String msg) {
         return sendToClient(payload);
     }
 
-    /**
-     * Sends this client's id to the client.
-     * This will be a successfully connection handshake
-     * 
-     * @return true for successful send
-     */
     protected boolean sendClientId() {
         ConnectionPayload payload = new ConnectionPayload();
         payload.setPayloadType(PayloadType.CLIENT_ID);
         payload.setClientId(getClientId());
-        payload.setClientName(getClientName());// Can be used as a Server-side override of username (i.e., profanity
-                                               // filter)
+        payload.setClientName(getClientName());
         return sendToClient(payload);
     }
 
-    /**
-     * Sends a message to the client
-     * 
-     * @param clientId who it's from
-     * @param message
-     * @return true for successful send
-     */
     protected boolean sendMessage(long clientId, String message) {
         Payload payload = new Payload();
         payload.setPayloadType(PayloadType.MESSAGE);
@@ -141,15 +90,16 @@ protected boolean sendRoundStart(String msg) {
         payload.setClientId(clientId);
         return sendToClient(payload);
     }
-    // lsl8 | 11/24/25 | send helpers
+
+    // lsl8 | 12/08/25 | Round Start Message
     protected boolean sendRoundStart() {
         Payload p = new Payload();
         p.setPayloadType(PayloadType.ROUND_START);
         p.setClientId(Constants.DEFAULT_CLIENT_ID);
-        p.setMessage("Round started! Make your pick with /pick r|p|s");
+        p.setMessage("Round started! Make your pick with /pick r|p|s|l|k");
         return sendToClient(p);
     }
-    // lsl8 | 11/24/25 | MS2 notice helper
+
     protected boolean sendPickedNotice(String msg) {
         Payload p = new Payload();
         p.setPayloadType(PayloadType.PICKED_NOTICE);
@@ -157,7 +107,6 @@ protected boolean sendRoundStart(String msg) {
         p.setMessage(msg);
         return sendToClient(p);
     }
-        
 
     protected boolean sendBattleResult(String msg) {
         Payload p = new Payload();
@@ -175,8 +124,8 @@ protected boolean sendRoundStart(String msg) {
         return sendToClient(p);
     }
 
-
     // End Send*() Methods
+
     @Override
     protected void processPayload(Payload incoming) {
 
@@ -184,53 +133,128 @@ protected boolean sendRoundStart(String msg) {
             case CLIENT_CONNECT:
                 setClientName(((ConnectionPayload) incoming).getClientName().trim());
                 break;
-    //lsl8 11/03/25 disconnect payLoad
+
             case DISCONNECT:
                 currentRoom.handleDisconnect(this);
                 break;
-            case MESSAGE:
-                currentRoom.handleMessage(this, incoming.getMessage());
+
+            case MESSAGE: {
+                String msg = incoming.getMessage();
+
+                if (msg != null && msg.startsWith("/")) {
+                    String lower = msg.toLowerCase();
+
+                    // /away
+                    if (lower.equals("/away")) {
+                        if (currentRoom instanceof GameRoom) {
+                            ((GameRoom) currentRoom).handleAway(this, true);
+                        } else {
+                            sendMessage(Constants.DEFAULT_CLIENT_ID,
+                                    "You must be in a game room to use /away");
+                        }
+                        break;
+                    }
+
+                    // /back
+                    if (lower.equals("/back")) {
+                        if (currentRoom instanceof GameRoom) {
+                            ((GameRoom) currentRoom).handleAway(this, false);
+                        } else {
+                            sendMessage(Constants.DEFAULT_CLIENT_ID,
+                                    "You must be in a game room to use /back");
+                        }
+                        break;
+                    }
+
+                    // /spectate <roomName>
+                    if (lower.startsWith("/spectate")) {
+                        String[] parts = msg.trim().split("\\s+", 2);
+                        if (parts.length < 2 || parts[1].trim().isEmpty()) {
+                            sendMessage(Constants.DEFAULT_CLIENT_ID,
+                                    "Usage: /spectate <roomName>");
+                        } else {
+                            String roomName = parts[1].trim();
+                            currentRoom.handleJoinRoom(this, roomName);
+                            if (currentRoom instanceof GameRoom) {
+                                ((GameRoom) currentRoom).handleSpectatorJoin(this);
+                            } else {
+                                sendMessage(Constants.DEFAULT_CLIENT_ID,
+                                        "Room " + roomName + " is not a game room.");
+                            }
+                        }
+                        break;
+                    }
+
+                    // /play -> stop spectating
+                    if (lower.equals("/play")) {
+                        if (currentRoom instanceof GameRoom) {
+                            ((GameRoom) currentRoom).handleStopSpectate(this);
+                        } else {
+                            sendMessage(Constants.DEFAULT_CLIENT_ID,
+                                    "You must be in a game room to use /play");
+                        }
+                        break;
+                    }
+                }
+
+                // Block chat messages from spectators
+                if (currentRoom instanceof GameRoom
+                        && ((GameRoom) currentRoom).isSpectator(getClientId())) {
+                    sendMessage(Constants.DEFAULT_CLIENT_ID,
+                            "Spectators can see chat but cannot send messages.");
+                    break;
+                }
+
+                currentRoom.handleMessage(this, msg);
                 break;
+            }
+
             case REVERSE:
                 currentRoom.handleReverseText(this, incoming.getMessage());
                 break;
+
             case ROOM_CREATE:
                 currentRoom.handleCreateRoom(this, incoming.getMessage());
                 break;
+
             case ROOM_JOIN:
                 currentRoom.handleJoinRoom(this, incoming.getMessage());
                 break;
+
             case ROOM_LEAVE:
                 currentRoom.handleJoinRoom(this, Room.LOBBY);
                 break;
-            // lsl8 | 11/24/25
+
             case READY:
                 if (currentRoom instanceof GameRoom) {
-                ((GameRoom) currentRoom).handleReady(this);
+                    ((GameRoom) currentRoom).handleReady(this);
                 } else {
                     sendMessage(Constants.DEFAULT_CLIENT_ID, "You must be in a game room to /ready");
                 }
                 break;
+
             case CHOICE_PICKED:
                 if (currentRoom instanceof GameRoom) {
-                ((GameRoom) currentRoom).handlePick(this, incoming.getMessage());
+                    ((GameRoom) currentRoom).handlePick(this, incoming.getMessage());
                 } else {
                     sendMessage(Constants.DEFAULT_CLIENT_ID, "You must be in a game room to /pick");
                 }
                 break;
+
             case POINTS_SYNC:
                 if (currentRoom instanceof GameRoom) {
-                ((GameRoom) currentRoom).handleScoreRequest(this);
+                    ((GameRoom) currentRoom).handleScoreRequest(this);
                 }
                 break;
+
             default:
                 System.out.println(TextFX.colorize("Unknown payload type received", Color.RED));
                 break;
         }
     }
+
     @Override
     protected void onInitialized() {
-        // once receiving the desired client name the object is ready
         onInitializationComplete.accept(this);
     }
 }
